@@ -24,6 +24,7 @@
         </Grid.ColumnDefinitions>
         <Border  Grid.Row="0" Grid.ColumnSpan="3" BorderBrush="Black" BorderThickness="3">
             <TextBlock x:Name="textBlock" 
+                       Text="{Binding DisplayText}"
                        FontSize="15" 
                        VerticalAlignment="Center" 
                        HorizontalAlignment="Center" 
@@ -44,8 +45,8 @@
                 Grid.Column="1" 
                 Content="0" 
                 x:Name="BtnZero"
-                Command="{Binding AddCommand}"
-                CommandParameter="0"/>
+                CommandParameter="0"
+                Click="BtnZero_Click"/>
         <Button Grid.Row="3" 
                 Grid.Column="0" 
                 Content="1"

@@ -20,10 +20,19 @@ namespace Calc
     /// </summary>
     public partial class MainWindow : Window
     {
+        private ViewModel.MainViewModel viewModel;
+
         public MainWindow()
         {
-            InitializeComponent();
-            BtnPlus.Click += this.AddCommand;
+            InitializeComponent();    
+            viewModel = new ViewModel.MainViewModel();
+            DataContext = viewModel;
+        }
+
+        private void BtnZero_Click(object sender, RoutedEventArgs e)
+        {
+            string parameter = (string)BtnZero.CommandParameter;
+            viewModel.UpdateDisplayText(parameter);
         }
     }
 }
