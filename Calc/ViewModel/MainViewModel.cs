@@ -25,10 +25,10 @@ namespace Calc.ViewModel
 
         public RelayCommand _AddCommand;
 
-        MainViewModel()
-        {
-            AddCommand = new RelayCommand(Click);
-        }
+        //MainViewModel()
+        //{
+        //    AddCommand = new RelayCommand(Click);
+        //}
 
 
         public ICommand AddCommand
