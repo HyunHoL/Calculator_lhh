@@ -10,6 +10,15 @@
     <Window.DataContext>
         <local:CalcVM />
     </Window.DataContext>
+    <Window.Resources>
+        <Style x:Key="button_style" TargetType="Button">
+            <Setter Property="Grid.Row" Value="0"/>
+            <Setter Property="Grid.Column" Value="3"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Background" Value="Aquamarine"/>
+        </Style>
+    </Window.Resources>
+
 
     <Grid Margin="10" HorizontalAlignment="Center" VerticalAlignment="Center">
         <Grid.RowDefinitions>
@@ -36,8 +45,7 @@
                        />
         </Border>
 
-        <Button Grid.Row="0" 
-                Grid.Column="3" 
+        <Button Style="{StaticResource button_style}"
                 Content="⌫"
                 x:Name="BtnBack"
                 />
