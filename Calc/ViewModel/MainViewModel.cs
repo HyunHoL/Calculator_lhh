@@ -8,10 +8,11 @@ using System.ComponentModel;
 
 namespace Calc.ViewModel
 {
+
     public partial class CalcVM : INotifyPropertyChanged
     {
         #region [상수]
-        
+
         public string inputString;
 
         public string mathematicalExpression;
@@ -111,7 +112,7 @@ namespace Calc.ViewModel
         * @note Patch-notes
         * 2023-08-09|이현호     
         */
-        
+
         private void GetOperator(object parameter)
         {
             if (inputString.Length > 0)
@@ -144,7 +145,14 @@ namespace Calc.ViewModel
             {
 
                 EnqueueNumber(double.Parse(inputString));
-                Swap(inputNumber, frontNumber - 1, frontNumber - 2);
+
+                if (inputOperator[rearOperator] == "*")
+                {
+
+                    Swap(inputNumber, frontNumber - 1, frontNumber - 2);
+
+                }
+
 
                 while (inputOperator[rearOperator] == "+" || inputOperator[rearOperator] == "-")
                 {
@@ -162,30 +170,6 @@ namespace Calc.ViewModel
 
                 }
 
-                //for (int i = rearOperator; i < inputOperator.Length; i++)
-                //{
-                //    if (inputOperator[i] == "*")
-                //    {
-                //        Swap(inputOperator, i, rearOperator);
-                //        Swap(inputNumber, i, rearNumber);
-                //        Swap(inputNumber, i + 1, rearNumber + 1);
-                //        break;
-                //    }
-
-                //    else if (inputOperator[i] == "/")
-                //    {
-                //        Swap(inputOperator, i, rearOperator);
-                //        Swap(inputNumber, i, rearNumber);
-                //        Swap(inputNumber, i + 1, rearNumber + 1);
-                //        break;
-                //    }
-
-                //    else
-                //    {
-                //        continue;
-                //    }
-                // }
-                
                 inputString = Calculate(DequeueOperator(), DequeueNumber(), DequeueNumber()).ToString();
                 count--;
 
@@ -214,21 +198,15 @@ namespace Calc.ViewModel
         * @note Patch-notes
         * 2023-08-09|이현호
         */
-        
+
         private static double Calculate(string inputOperator, double inputNumber1, double inputNumber2)
         {
-            switch(inputOperator)
+            switch (inputOperator)
             {
                 case "+": return inputNumber1 + inputNumber2;
                 case "-": return inputNumber1 - inputNumber2;
                 case "*": return inputNumber1 * inputNumber2;
-                case "/": 
-                    if (inputNumber2 == 0)
-                    {
-                        return 99999999999;
-                    }
-                    
-                    return inputNumber1 / inputNumber2;
+                case "/": return inputNumber1 / inputNumber2;
             }
 
             return 0;
@@ -241,7 +219,7 @@ namespace Calc.ViewModel
         * 2023-08-10|이현호
         */
 
-        private void EnqueueOperator (string operate)
+        private void EnqueueOperator(string operate)
         {
             inputOperator[frontOperator] = operate;
             frontOperator = (frontOperator + 1) % inputOperator.Length;
@@ -255,7 +233,7 @@ namespace Calc.ViewModel
         * 2023-08-10|이현호
         */
 
-        private string DequeueOperator ()
+        private string DequeueOperator()
         {
             string operate = inputOperator[rearOperator];
             rearOperator = (rearOperator + 1) % inputOperator.Length;
@@ -297,7 +275,7 @@ namespace Calc.ViewModel
         * 2023-08-10|이현호
         */
 
-        private void Swap<T> (T[] array, int index1, int index2)
+        private void Swap<T>(T[] array, int index1, int index2)
         {
             T temp = array[index1];
             array[index1] = array[index2];
@@ -311,7 +289,7 @@ namespace Calc.ViewModel
         * 2023-08-10|이현호
         */
 
-        private void CalcSin (object parameter)
+        private void CalcSin(object parameter)
         {
             try
             {
@@ -350,6 +328,10 @@ namespace Calc.ViewModel
         private void CalcTan(object parameter)
         {
             double tanValue = Math.Tan(double.Parse(inputString) * Math.PI / 180);
+            if (double.Parse(inputString) * Math.PI / 180 % 90 == 0)
+            {
+                DisplayText = "ERROR";
+            }
             inputString = tanValue.ToString();
             DisplayText = tanValue.ToString();
         }
