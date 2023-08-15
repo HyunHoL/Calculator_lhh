@@ -32,14 +32,74 @@
             <ColumnDefinition Width="60"/>
             <ColumnDefinition Width="60"/>
             <ColumnDefinition Width="60"/>
+            <ColumnDefinition Width="60"/>
+            <ColumnDefinition Width="60"/>
+            <ColumnDefinition Width="60"/>
+            <ColumnDefinition Width="60"/>
         </Grid.ColumnDefinitions>
         <Border  Grid.Row="0" Grid.ColumnSpan="4" BorderBrush="Black" BorderThickness="2.5" Background="LightGray">
-            <TextBlock x:Name="textBlock" 
+            <TextBox x:Name="textBox"                      
                        FontSize="25" 
                        VerticalAlignment="Center" 
                        HorizontalAlignment="Center" 
-                       Text="{Binding DisplayText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                       />
+                       Text="{Binding DisplayText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                       >
+
+                <TextBox.InputBindings>
+                    <KeyBinding Command="{Binding CalcCommand}" Key="Enter"/>
+                </TextBox.InputBindings>
+            </TextBox>
+        </Border>
+
+        <Border Grid.Row="4" Grid.Column="5" Grid.ColumnSpan="4" BorderBrush="Black" BorderThickness="2.5" Background="LightGray">
+            <TextBox
+                x:Name="textBlock1"
+                FontSize="25"
+                 VerticalAlignment="Center" 
+                HorizontalAlignment="Center" 
+                Text="{Binding DisplayHis1, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+ 
+                ></TextBox>
+        </Border>
+
+        <Border Grid.Row="3" Grid.Column="5" Grid.ColumnSpan="4" BorderBrush="Black" BorderThickness="2.5" Background="LightGray">
+            <TextBox
+                x:Name="textBlock2"
+                FontSize="25"
+                 VerticalAlignment="Center" 
+                HorizontalAlignment="Center" 
+                Text="{Binding DisplayHis2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                ></TextBox>
+        </Border>
+
+        <Border Grid.Row="2" Grid.Column="5" Grid.ColumnSpan="4" BorderBrush="Black" BorderThickness="2.5" Background="LightGray">
+            <TextBox
+                x:Name="textBlock3"
+                FontSize="25"
+                 VerticalAlignment="Center" 
+                HorizontalAlignment="Center" 
+                Text="{Binding DisplayHis3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                ></TextBox>
+        </Border>
+
+        <Border Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="4" BorderBrush="Black" BorderThickness="2.5" Background="LightGray">
+            <TextBox
+                x:Name="textBlock4"
+                FontSize="25"
+                 VerticalAlignment="Center" 
+                HorizontalAlignment="Center" 
+                Text="{Binding DisplayHis4, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                ></TextBox>
+        </Border>
+
+        <Border Grid.Row="0" Grid.Column="5" Grid.ColumnSpan="4" BorderBrush="Black" BorderThickness="2.5" Background="LightGray">
+            <TextBox
+                x:Name="textBlock5"
+                FontSize="25"
+                 VerticalAlignment="Center" 
+                HorizontalAlignment="Center" 
+                Text="{Binding DisplayHis5, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                ></TextBox>
         </Border>
 
         <Button Grid.Row="0" 
@@ -291,5 +351,6 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
+        <ListBox Grid.Column="8" HorizontalAlignment="Left" Margin="60,0,-100,0" Grid.RowSpan="5" Width="100"/>
     </Grid>
 </Window>

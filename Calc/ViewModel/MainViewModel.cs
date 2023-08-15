@@ -5,29 +5,37 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using Calc.Model;
+using System.Collections.ObjectModel;
 
 namespace Calc.ViewModel
 {
 
     public partial class CalcVM : INotifyPropertyChanged
     {
+
         #region [상수]
 
         public string inputString;
 
         public string mathematicalExpression;
 
-        public int frontOperator, rearOperator;
+        public string history;
 
-        public int frontNumber, rearNumber;
+        public string[] inputValue;
 
-        public int frontZero;
+        public string[] stack;
 
-        public double[] inputNumber;
+        public int top2;
 
-        public string[] inputOperator;
+        public int top;
 
-        int count;
+        public int front;
+
+        public int rear;
+
+        public string[] historySave;
+
         #endregion
 
         #region [속성]
@@ -39,28 +47,32 @@ namespace Calc.ViewModel
         public ICommand CosCommand { get; }
         public ICommand TanCommand { get; }
         public ICommand RootCommand { get; }
-
+        public ICommand HistoryCommand { get; }
+        public string HistorySaveElement { get; }
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
 
         #region [생성자]
         public CalcVM()
         {
+
             inputString = string.Empty;
-            mathematicalExpression = "";
-            frontOperator = rearOperator = 0;
-            frontNumber = rearNumber = 0;
-            count = 0;
-            inputNumber = new double[100];
-            inputOperator = new string[10];
+            history = mathematicalExpression = "";            
+            inputValue = new string[1000];
+            stack = new string[1000];
+            top = top2 = -1;
+            historySave = new string[10];
+            front = rear = 0;
+
             AddCommand = new RelayCommand(UpdateDisplayText);
-            OperationCommand = new RelayCommand(GetOperator);
-            CalcCommand = new RelayCommand(StartCalculate);
+            OperationCommand = new RelayCommand(GetOperator2);
+            CalcCommand = new RelayCommand(CalcPostfix);
             ClearCommand = new RelayCommand(StartClear);
             SinCommand = new RelayCommand(CalcSin);
             CosCommand = new RelayCommand(CalcCos);
             TanCommand = new RelayCommand(CalcTan);
             RootCommand = new RelayCommand(CalcRoot);
+
         }
 
         #endregion
@@ -88,9 +100,34 @@ namespace Calc.ViewModel
             }
         }
 
+
+
+        public string DisplayHis1
+        {
+            get { return historySave[0]; }
+
+            set
+            {
+                if (historySave[0] != value) 
+                {
+                    historySave[0] = value;
+                    OnPropertyChanged("DisplayHis1");
+                }
+            }
+        }
         #endregion
 
         #region [private Method] 
+
+
+        private void AllClear ()
+        {
+            inputString = "";
+            Array.Clear(inputValue, 0, inputValue.Length);
+            Array.Clear(stack, 0, stack.Length);
+            top = -1;
+            top2 = -1;
+        }
 
         /**
         * @brief 숫자 버튼을 클릭했을 때 숫자를 DisplayText와 InputString에 저장해주는 함수
@@ -103,80 +140,269 @@ namespace Calc.ViewModel
         {
             DisplayText += parameter;
             inputString += (string)parameter;
-
         }
 
-        /**
-        * @brief 연산자를 받았을 때 이전에 입력된 숫자를 inputNumber1 변수에 저장하고 연산자를 inputOperator 변수에 저장해주는 함수
-        * @param+,-,*,/ 연산자를 받아옴
-        * @note Patch-notes
-        * 2023-08-09|이현호     
-        */
-
-        private void GetOperator(object parameter)
+        private void Push (string infixOperator)
         {
-            if (inputString.Length > 0)
+            if (top == inputValue.Length - 1)
             {
-                if ((string)parameter == "*" || (string)parameter == "/")
-                {
-                    count++;
-                }
-                DisplayText += parameter;
-                EnqueueNumber(double.Parse(inputString));
-                inputString = "";
-                EnqueueOperator(parameter.ToString());
+                return;
             }
+
+            top++;
+            inputValue[top] = infixOperator;
         }
 
-        /**
-        * @brief Calculate 함수를 이용해 연산을 진행해주는 함수
-        * @param = 등호 기호가 클릭되었을 때만 실행
-        * @note Patch-notes
-        * 2023-08-09|이현호
-        * 2023-08-10|이현호|+,-와 *,/ 할 때 우선 순위를 지켜서 연산을 하게 만들었다.
-        * @warning * 와 / 가 2개 이상 나올 경우 정확한 연산이 되지 않는다.
-        */
-
-        private void StartCalculate(object parameter)
+        private void Push2 (string infixOperator)
         {
-            DisplayText += parameter;
-
-            while (frontNumber != rearNumber && frontOperator != rearOperator)
+            if (top2 == stack.Length - 1)
             {
+                return;
+            }
 
-                EnqueueNumber(double.Parse(inputString));
+            top2++;
+            stack[top2] = infixOperator;
+        }
 
-                if (inputOperator[rearOperator] == "*")
+
+        private string Pop ()
+        {
+            if (top == -1)
+            {
+                return "ERROR";
+            }
+
+            string result = inputValue[top];
+            top--;
+            return result;
+        }
+
+        private string Pop2()
+        {
+            if (top2 == -1)
+            {
+                return "ERROR";
+            }
+
+            string result = stack[top2];
+            top2--;
+
+            return result;
+        }
+
+        private void Enqueue (string inputNum)
+        {
+            historySave[front] = inputNum;
+            front = (front + 1) % historySave.Length;
+            return;
+        }
+
+        private string Dequeue ()
+        {
+            if (front == rear)
+            {
+                return "ERROR";
+            }
+
+            string result = historySave[rear];
+            rear = (rear + 1) % historySave.Length;
+
+            return result;
+        }
+
+        private void GetOperator2 (object parameter)
+        {
+            if ((string)parameter == "-")
+            {
+                Push((string)inputString);
+                DisplayText += parameter;
+                inputString = "";
+                Push("+");
+                inputString += "-";
+                return;
+            }
+            Push((string)inputString);            
+            DisplayText += parameter;
+            inputString = "";
+            Push((string)parameter);
+        }
+        
+        private int Priority (string infixOperator)
+        {
+            if (inputValue[top] == "(")
+            {
+                return 1;
+            }
+
+            else if (infixOperator == "*" || infixOperator == "/")
+            {
+                if (stack[top2] == "+" || stack[top2] == "-")
                 {
+                    return 1;
+                }
+            }
 
-                    Swap(inputNumber, frontNumber - 1, frontNumber - 2);
 
+            return 0;
+        }
+
+        private void Postfix(string[] postfix)
+        {
+            if (inputString == "" && DisplayText != "")
+            {
+                for (int i = 0; i < DisplayText.Length; i++)
+                {
+                    inputString = DisplayText[i].ToString();
+                    Push(inputString);
+                }
+            }
+
+            else
+            {
+                Push(inputString);
+            }
+            int topPostfix = -1;
+            int idx = 0;
+
+            while (idx != top + 1)
+            {
+                string infixOperator = inputValue[idx];
+                
+                // 1. 처음이 숫자일 때                
+                if (double.TryParse(infixOperator, out double parsenumber))
+                {
+                    topPostfix++;
+                    postfix[topPostfix] = infixOperator;
                 }
 
-
-                while (inputOperator[rearOperator] == "+" || inputOperator[rearOperator] == "-")
+                // 연산자, (, ) 일 때
+                else
                 {
-                    if (count <= 0)
+                    if (infixOperator == "(")
                     {
-                        break;
+                        Push2(infixOperator);
                     }
 
-                    double goBack = 0;
-                    string goBack2 = "";
-                    goBack = DequeueNumber();
-                    EnqueueNumber(goBack);
-                    goBack2 = DequeueOperator();
-                    EnqueueOperator(goBack2);
+                    else if (infixOperator == ")")
+                    {
+                        while (true)
+                        {
+                            string postfixOperator = Pop();
 
+                            if (postfixOperator == "(")
+                            {
+                                break;
+                            }
+                            postfix[topPostfix] = postfixOperator;
+                            topPostfix++;
+                        }
+                    }
+
+                    else
+                    {
+                        if (top2 == -1)
+                        {
+                            Push2(infixOperator);
+                        }
+
+                        else
+                        {
+                            while (true)
+                            {
+                                if (Priority(infixOperator) < Priority(stack[top2]))
+                                {
+                                    topPostfix++;
+                                    postfix[topPostfix] = Pop2();
+                                }
+
+                                else if ((infixOperator == "*" || infixOperator == "/") && (stack[top2] == "*" || stack[top2] == "/"))
+                                {
+                                    topPostfix++;
+                                    postfix[topPostfix] = Pop2();
+                                }
+
+                                else if ((infixOperator == "+" || infixOperator == "-") && (stack[top2] == "*" || stack[top2] == "/"))
+                                {
+                                    topPostfix++;
+                                    postfix[topPostfix] = Pop2();
+                                }
+
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            Push2(infixOperator);
+                        }
+                    }
+                }
+                idx++;
+            }
+            while (top2 != -1)
+            {
+                topPostfix++;
+                postfix[topPostfix] = Pop2();
+            }
+        }
+
+        private void CalcPostfix (object parameter)
+        {
+            
+            string[] lastPostfix = new string[1000];
+            Postfix(lastPostfix);
+
+
+            if (lastPostfix.Length < 3)
+            {
+                DisplayText = "ERROR";
+                AllClear();
+                return;
+            }
+
+            if (!double.TryParse(lastPostfix[0], out double letter))
+            {
+                DisplayText = "ERROR";
+                AllClear();
+                return;
+            }
+
+            int idx = 0;
+
+            while (lastPostfix[idx] != null)
+            {
+                string postfixOperator = lastPostfix[idx];
+
+                if (double.TryParse(postfixOperator, out double parsenumber))
+                {
+                    Push2(postfixOperator);
                 }
 
-                inputString = Calculate(DequeueOperator(), DequeueNumber(), DequeueNumber()).ToString();
-                count--;
+                else
+                {
+                    double number1 = double.Parse(Pop2());
+                    double number2 = double.Parse(Pop2());
 
+                    if (postfixOperator == "/" && number1 == 0)
+                    {
+                        DisplayText = "ERROR";
+                        AllClear();
+                        return;
+                    }
+
+                    double result = Calculate(postfixOperator, number1, number2);
+                    Push(result.ToString());
+                    Push2(result.ToString());
+                }
+                idx++;
             }
-            DisplayText = "";
-            DisplayText += inputString;
+            string displayed = DisplayText;
+            DisplayText = Pop();
+            Enqueue(displayed + " = " + DisplayText);
+            DisplayHis1 += historySave[0];
+            AllClear();
+            inputString = DisplayText;
         }
+
         /**
         * @brief 이전 연산 기록을 모두 지우는 함수
         * @param AC 기호가 클릭 되었을 때만 실행
@@ -186,9 +412,7 @@ namespace Calc.ViewModel
 
         private void StartClear(object parameter)
         {
-            inputString = "";
-            Array.Clear(inputNumber, 0, inputNumber.Length);
-            Array.Clear(inputOperator, 0, inputOperator.Length);
+            AllClear();
             DisplayText = "";
         }
 
@@ -201,85 +425,16 @@ namespace Calc.ViewModel
 
         private static double Calculate(string inputOperator, double inputNumber1, double inputNumber2)
         {
+                     
             switch (inputOperator)
             {
                 case "+": return inputNumber1 + inputNumber2;
-                case "-": return inputNumber1 - inputNumber2;
+                case "-": return inputNumber2 - inputNumber1;
                 case "*": return inputNumber1 * inputNumber2;
-                case "/": return inputNumber1 / inputNumber2;
+                case "/": return inputNumber2 / inputNumber1;
             }
 
             return 0;
-        }
-
-        /**
-        * @brief 연산자를 저장하는 배열에 연산자를 추가하는 함수  
-        * @param 연산자가 클릭 되었을 때의 연산자 (+, -, /, *)
-        * @note Patch-notes
-        * 2023-08-10|이현호
-        */
-
-        private void EnqueueOperator(string operate)
-        {
-            inputOperator[frontOperator] = operate;
-            frontOperator = (frontOperator + 1) % inputOperator.Length;
-            return;
-        }
-
-        /**
-        * @brief 연산자를 저장하는 배열에서 연산자를 꺼내오하는 함수  
-        * @return (string)배열 제일 앞에 있는 연산자
-        * @note Patch-notes
-        * 2023-08-10|이현호
-        */
-
-        private string DequeueOperator()
-        {
-            string operate = inputOperator[rearOperator];
-            rearOperator = (rearOperator + 1) % inputOperator.Length;
-            return operate;
-        }
-
-        /**
-        * @brief 숫자를 저장하는 배열에서 숫자를 추가하는 함수  
-        * @param 숫자가 클릭 되었을 때의 숫자
-        * @note Patch-notes
-        * 2023-08-10|이현호
-        */
-
-        private void EnqueueNumber(double num)
-        {
-            inputNumber[frontNumber] = num;
-            frontNumber = (frontNumber + 1) % inputNumber.Length;
-            return;
-        }
-
-        /**
-        * @brief 숫자를 저장하는 배열에서 숫자를 꺼내오하는 함수  
-        * @return (string)배열 제일 앞에 있는 숫자
-        * @note Patch-notes
-        * 2023-08-10|이현호
-        */
-
-        private double DequeueNumber()
-        {
-            double num = inputNumber[rearNumber];
-            rearNumber = (rearNumber + 1) % inputNumber.Length;
-            return num;
-        }
-
-        /**
-        * @brief 배열에서 원하는 위치에 있는 값들의 자리를 바꾸는 함수  
-        * @param (순서를 바꿀 배열, 인덱스 번호, 인덱스 번호)
-        * @note Patch-notes
-        * 2023-08-10|이현호
-        */
-
-        private void Swap<T>(T[] array, int index1, int index2)
-        {
-            T temp = array[index1];
-            array[index1] = array[index2];
-            array[index2] = temp;
         }
 
         /**
@@ -291,17 +446,16 @@ namespace Calc.ViewModel
 
         private void CalcSin(object parameter)
         {
-            try
+            if (!double.TryParse(inputString, out double letter))
             {
-                double sinValue = Math.Sin(double.Parse(inputString) * Math.PI / 180);
-                inputString = sinValue.ToString();
-                DisplayText = sinValue.ToString();
+                DisplayText = "ERROR";
+                AllClear();
+                return;
             }
 
-            catch (FormatException)
-            {
-                Console.WriteLine("ERROR");
-            }
+            double sinValue = Math.Sin(double.Parse(inputString) * Math.PI / 180);
+            inputString = sinValue.ToString();
+            DisplayText = sinValue.ToString();
         }
 
         /**
@@ -313,6 +467,12 @@ namespace Calc.ViewModel
 
         private void CalcCos(object parameter)
         {
+            if (!double.TryParse(inputString, out double letter))
+            {
+                DisplayText = "ERROR";
+                AllClear();
+                return;
+            }
             double cosValue = Math.Cos(double.Parse(inputString) * Math.PI / 180);
             inputString = cosValue.ToString();
             DisplayText = cosValue.ToString();
@@ -327,10 +487,20 @@ namespace Calc.ViewModel
 
         private void CalcTan(object parameter)
         {
-            double tanValue = Math.Tan(double.Parse(inputString) * Math.PI / 180);
-            if (double.Parse(inputString) * Math.PI / 180 % 90 == 0)
+            if (!double.TryParse(inputString, out double letter))
             {
                 DisplayText = "ERROR";
+                AllClear();
+                return;
+            }
+
+            double tanValue = Math.Tan(double.Parse(inputString) * Math.PI / 180);
+            
+            if (double.Parse(inputString) % 90 == 0)
+            {
+                DisplayText = "ERROR";
+                AllClear();
+                return;
             }
             inputString = tanValue.ToString();
             DisplayText = tanValue.ToString();
@@ -345,6 +515,19 @@ namespace Calc.ViewModel
 
         private void CalcRoot(object parameter)
         {
+            if (!double.TryParse(inputString, out double letter))
+            {
+                DisplayText = "ERROR";
+                AllClear();
+                return;
+            }
+
+            if (double.Parse(inputString) < 0)
+            {
+                DisplayText = "ERROR";
+                AllClear();
+                return;
+            }
             double rootValue = Math.Sqrt(double.Parse(inputString));
             inputString = rootValue.ToString();
             DisplayText = rootValue.ToString();
