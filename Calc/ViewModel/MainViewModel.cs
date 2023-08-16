@@ -10,6 +10,11 @@ using System.Collections.ObjectModel;
 
 namespace Calc.ViewModel
 {
+    public class  Calculation
+    {
+        public string Expression { get; set; }
+        public string Result { get; set; }
+    }
 
     public partial class CalcVM : INotifyPropertyChanged
     {
@@ -20,7 +25,9 @@ namespace Calc.ViewModel
 
         public string mathematicalExpression;
 
-        public string history;
+        public string history, history2, history3, history4, history5;
+
+        public string result, result2, result3, result4, result5;
 
         public string[] inputValue;
 
@@ -36,6 +43,8 @@ namespace Calc.ViewModel
 
         public string[] historySave;
 
+        public string inputNum;
+
         #endregion
 
         #region [속성]
@@ -43,12 +52,15 @@ namespace Calc.ViewModel
         public ICommand OperationCommand { get; }
         public ICommand CalcCommand { get; }
         public ICommand ClearCommand { get; }
+        public ICommand DeleteCommand { get; }
         public ICommand SinCommand { get; }
         public ICommand CosCommand { get; }
         public ICommand TanCommand { get; }
         public ICommand RootCommand { get; }
-        public ICommand HistoryCommand { get; }
-        public string HistorySaveElement { get; }
+        public ObservableCollection<String> HistorySave { get; } = new ObservableCollection<string>();
+        public ICommand ToggleListViewCommand { get; }
+        private bool _isListViewVisible = false;
+
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
 
@@ -56,28 +68,49 @@ namespace Calc.ViewModel
         public CalcVM()
         {
 
-            inputString = string.Empty;
-            history = mathematicalExpression = "";            
-            inputValue = new string[1000];
-            stack = new string[1000];
+            inputNum = inputString = string.Empty;
+            history2 = history3 = history4 = history5 = history = mathematicalExpression = "";
+            result = result2 = result3 = result4 = result5 = "";
+            inputValue = new string[100];
+            stack = new string[100];
             top = top2 = -1;
             historySave = new string[10];
             front = rear = 0;
 
             AddCommand = new RelayCommand(UpdateDisplayText);
-            OperationCommand = new RelayCommand(GetOperator2);
+            OperationCommand = new RelayCommand(GetOperator);
             CalcCommand = new RelayCommand(CalcPostfix);
             ClearCommand = new RelayCommand(StartClear);
+            DeleteCommand = new RelayCommand(StartDelete);
             SinCommand = new RelayCommand(CalcSin);
             CosCommand = new RelayCommand(CalcCos);
             TanCommand = new RelayCommand(CalcTan);
             RootCommand = new RelayCommand(CalcRoot);
-
+            ToggleListViewCommand = new RelayCommand(ToggleListViewVisibility);
         }
 
         #endregion
 
         #region [public Method]
+
+        public bool IsListViewVisible
+        {
+            get => _isListViewVisible;
+
+            set
+            {
+                if (_isListViewVisible != value)
+                {
+                    _isListViewVisible = value;
+                    OnPropertyChanged("IsListViewVisible");
+                }
+            }
+        }
+
+        public void ToggleListViewVisibility()
+        {
+            IsListViewVisible = !IsListViewVisible;
+        }
 
         /**
         * @brief DisplayText가 변할 때 마다 TextBlock의 Text를 업데이트 해주는 함수
@@ -100,25 +133,15 @@ namespace Calc.ViewModel
             }
         }
 
-
-
-        public string DisplayHis1
-        {
-            get { return historySave[0]; }
-
-            set
-            {
-                if (historySave[0] != value) 
-                {
-                    historySave[0] = value;
-                    OnPropertyChanged("DisplayHis1");
-                }
-            }
-        }
         #endregion
 
         #region [private Method] 
 
+        /**
+        * @brief 입력 받은 모든 값을 초기화 해주는 함수
+        * @note Patch-notes
+        * 2023-08-14|이현호
+        */
 
         private void AllClear ()
         {
@@ -138,9 +161,25 @@ namespace Calc.ViewModel
 
         private void UpdateDisplayText(object parameter)
         {
-            DisplayText += parameter;
-            inputString += (string)parameter;
+            if ((string)parameter == "(" || (string)parameter == ")")
+            {
+                DisplayText += parameter;
+                inputString = (string)parameter;
+            }
+
+            else
+            {
+                DisplayText += parameter;
+                inputString += parameter;
+            }
         }
+
+        /**
+        * @brief 숫자와 연산자가 들어왔을 때 inputValue 배열에 푸쉬해주는 함수
+        * @param 버튼을 눌렀을 때, parameter를 string으로 받아 온다.
+        * @note Patch-notes
+        * 2023-08-14|이현호
+        */
 
         private void Push (string infixOperator)
         {
@@ -153,6 +192,13 @@ namespace Calc.ViewModel
             inputValue[top] = infixOperator;
         }
 
+        /**
+        * @brief 숫자와 연산자가 들어왔을 때 stack 배열에 푸쉬해주는 함수
+        * @param 버튼을 눌렀을 때, parameter를 string으로 받아 온다.
+        * @note Patch-notes
+        * 2023-08-14|이현호
+        */
+
         private void Push2 (string infixOperator)
         {
             if (top2 == stack.Length - 1)
@@ -164,6 +210,12 @@ namespace Calc.ViewModel
             stack[top2] = infixOperator;
         }
 
+        /**
+        * @brief inputValue 배열의 마지막에 들어온 값을 빼주는 함수
+        * @return (string) 배열의 제일 마지막에 들어온 값을 반환
+        * @note Patch-notes
+        * 2023-08-14|이현호
+        */
 
         private string Pop ()
         {
@@ -176,6 +228,13 @@ namespace Calc.ViewModel
             top--;
             return result;
         }
+
+        /**
+        * @brief stack 배열의 마지막에 들어온 값을 빼주는 함수
+        * @return (string) 배열의 제일 마지막에 들어온 값을 반환
+        * @note Patch-notes
+        * 2023-08-14|이현호
+        */
 
         private string Pop2()
         {
@@ -210,7 +269,14 @@ namespace Calc.ViewModel
             return result;
         }
 
-        private void GetOperator2 (object parameter)
+        /**
+        * @brief 연산자 버튼이 클릭 되었을 때, 이전에 입력한 숫자와 연산자를 inputValue 배열에 추가해주는 함수
+        * @param 연산자 (+, -, *, /)
+        * @note Patch-notes
+        * 2023-08-14|이현호
+        */
+
+        private void GetOperator (object parameter)
         {
             if ((string)parameter == "-")
             {
@@ -221,12 +287,21 @@ namespace Calc.ViewModel
                 inputString += "-";
                 return;
             }
-            Push((string)inputString);            
+
+            Push(inputString);
             DisplayText += parameter;
             inputString = "";
             Push((string)parameter);
         }
-        
+
+        /**
+        * @brief 연산자의 우선순위를 정해주는 함수
+        * @param 연산자 (+, -, *, /)
+        * @return (int) +, - 가 들어왔을 때, 0을 return, *나 / 가 들어왔을 때, 이전에 들어온 연산자가 +나 -이면 1을 return
+        * @note Patch-notes
+        * 2023-08-14|이현호
+        */
+
         private int Priority (string infixOperator)
         {
             if (inputValue[top] == "(")
@@ -236,46 +311,37 @@ namespace Calc.ViewModel
 
             else if (infixOperator == "*" || infixOperator == "/")
             {
-                if (stack[top2] == "+" || stack[top2] == "-")
-                {
-                    return 1;
-                }
+                return 1;
             }
 
 
             return 0;
         }
 
+        /**
+        * @brief infix 수식을 postfix 수식으로 바꿔주는 함수
+        * @param infix 식을 postfix로 바꿀 배열
+        * @note Patch-notes
+        * 2023-08-14|이현호
+        */
+
         private void Postfix(string[] postfix)
         {
-            if (inputString == "" && DisplayText != "")
-            {
-                for (int i = 0; i < DisplayText.Length; i++)
-                {
-                    inputString = DisplayText[i].ToString();
-                    Push(inputString);
-                }
-            }
+            Push(inputString);
 
-            else
-            {
-                Push(inputString);
-            }
             int topPostfix = -1;
             int idx = 0;
 
             while (idx != top + 1)
             {
                 string infixOperator = inputValue[idx];
-                
-                // 1. 처음이 숫자일 때                
+                              
                 if (double.TryParse(infixOperator, out double parsenumber))
                 {
                     topPostfix++;
                     postfix[topPostfix] = infixOperator;
                 }
 
-                // 연산자, (, ) 일 때
                 else
                 {
                     if (infixOperator == "(")
@@ -309,19 +375,19 @@ namespace Calc.ViewModel
                         {
                             while (true)
                             {
-                                if (Priority(infixOperator) < Priority(stack[top2]))
+                                if (top2 == -1)
+                                {
+                                    break;
+                                }
+
+                                else if (Priority(infixOperator) < Priority(stack[top2]))
                                 {
                                     topPostfix++;
                                     postfix[topPostfix] = Pop2();
                                 }
+
 
                                 else if ((infixOperator == "*" || infixOperator == "/") && (stack[top2] == "*" || stack[top2] == "/"))
-                                {
-                                    topPostfix++;
-                                    postfix[topPostfix] = Pop2();
-                                }
-
-                                else if ((infixOperator == "+" || infixOperator == "-") && (stack[top2] == "*" || stack[top2] == "/"))
                                 {
                                     topPostfix++;
                                     postfix[topPostfix] = Pop2();
@@ -338,6 +404,7 @@ namespace Calc.ViewModel
                 }
                 idx++;
             }
+
             while (top2 != -1)
             {
                 topPostfix++;
@@ -345,19 +412,18 @@ namespace Calc.ViewModel
             }
         }
 
+        /**
+        * @brief postfix 수식을 연산해주는 함수
+        * @param 연산할 postfix 배열
+        * @note Patch-notes
+        * 2023-08-14|이현호
+        */
+
         private void CalcPostfix (object parameter)
         {
             
-            string[] lastPostfix = new string[1000];
+            string[] lastPostfix = new string[100];
             Postfix(lastPostfix);
-
-
-            if (lastPostfix.Length < 3)
-            {
-                DisplayText = "ERROR";
-                AllClear();
-                return;
-            }
 
             if (!double.TryParse(lastPostfix[0], out double letter))
             {
@@ -379,6 +445,7 @@ namespace Calc.ViewModel
 
                 else
                 {
+
                     double number1 = double.Parse(Pop2());
                     double number2 = double.Parse(Pop2());
 
@@ -389,7 +456,7 @@ namespace Calc.ViewModel
                         return;
                     }
 
-                    double result = Calculate(postfixOperator, number1, number2);
+                    double result = Calculator.Calculate(postfixOperator, number1, number2);
                     Push(result.ToString());
                     Push2(result.ToString());
                 }
@@ -397,8 +464,8 @@ namespace Calc.ViewModel
             }
             string displayed = DisplayText;
             DisplayText = Pop();
-            Enqueue(displayed + " = " + DisplayText);
-            DisplayHis1 += historySave[0];
+            HistorySave.Add(displayed + "=" + DisplayText);
+
             AllClear();
             inputString = DisplayText;
         }
@@ -414,27 +481,12 @@ namespace Calc.ViewModel
         {
             AllClear();
             DisplayText = "";
+            HistorySave.Clear();
         }
 
-        /**
-        * @brief 연산 기호 별로 연산을 진행해주는 함수
-        * @return (double) 연산 결과 값을 반환해줌
-        * @note Patch-notes
-        * 2023-08-09|이현호
-        */
-
-        private static double Calculate(string inputOperator, double inputNumber1, double inputNumber2)
+        private void StartDelete (object parameter)
         {
-                     
-            switch (inputOperator)
-            {
-                case "+": return inputNumber1 + inputNumber2;
-                case "-": return inputNumber2 - inputNumber1;
-                case "*": return inputNumber1 * inputNumber2;
-                case "/": return inputNumber2 / inputNumber1;
-            }
-
-            return 0;
+            Pop();
         }
 
         /**

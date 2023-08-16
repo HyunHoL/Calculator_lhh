@@ -11,6 +11,12 @@ namespace Calc.ViewModel
     {
         private readonly Action<object> _execute;
         private readonly Func<object, bool> _canExecute;
+        private Action toggleListViewVisibility;
+
+        public RelayCommand(Action toggleListViewVisibility)
+        {
+            this.toggleListViewVisibility = toggleListViewVisibility;
+        }
 
         public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
         {

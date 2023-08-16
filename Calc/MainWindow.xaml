@@ -15,10 +15,12 @@
         <Style TargetType="Button" x:Key="GrayTextButtonStyle">
             <Setter Property="Foreground" Value="Gray"/>
         </Style>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
 
     <Grid Margin="10" HorizontalAlignment="Center" VerticalAlignment="Center">
         <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
             <RowDefinition Height="60"/>
             <RowDefinition Height="60"/>
             <RowDefinition Height="60"/>
@@ -37,73 +39,57 @@
             <ColumnDefinition Width="60"/>
             <ColumnDefinition Width="60"/>
         </Grid.ColumnDefinitions>
-        <Border  Grid.Row="0" Grid.ColumnSpan="4" BorderBrush="Black" BorderThickness="2.5" Background="LightGray">
+
+        <Border  Grid.Row="0" Grid.ColumnSpan="5" BorderBrush="Black" BorderThickness="2.5" Background="Gray" >
             <TextBox x:Name="textBox"                      
                        FontSize="25" 
                        VerticalAlignment="Center" 
                        HorizontalAlignment="Center" 
-                       Text="{Binding DisplayText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                       Text="{Binding DisplayText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Background="LightGray" BorderThickness="0"
                        >
-
                 <TextBox.InputBindings>
                     <KeyBinding Command="{Binding CalcCommand}" Key="Enter"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="NumPad0" CommandParameter="0"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="D0" CommandParameter="0"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="NumPad1" CommandParameter="1"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="D1" CommandParameter="1"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="NumPad2" CommandParameter="2"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="D2" CommandParameter="2"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="NumPad3" CommandParameter="3"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="D3" CommandParameter="3"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="NumPad4" CommandParameter="4"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="D4" CommandParameter="4"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="NumPad5" CommandParameter="5"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="D5" CommandParameter="5"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="NumPad6" CommandParameter="6"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="D6" CommandParameter="6"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="NumPad7" CommandParameter="7"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="D7" CommandParameter="7"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="NumPad8" CommandParameter="8"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="D8" CommandParameter="8"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="NumPad9" CommandParameter="9"/>
+                    <KeyBinding Command="{Binding AddCommand}" Key="D9" CommandParameter="9"/>
+                    <KeyBinding Command="{Binding OperationCommand}" Key="Add" CommandParameter="+"/>
+                    <KeyBinding Command="{Binding OperationCommand}" Key="Subtract" CommandParameter="-"/>
+                    <KeyBinding Command="{Binding OperationCommand}" Key="Multiply" CommandParameter="*"/>
+                    <KeyBinding Command="{Binding OperationCommand}" Key="Divide" CommandParameter="/"/>
                 </TextBox.InputBindings>
             </TextBox>
         </Border>
+        <ToggleButton Grid.Row="1" Grid.Column="0" FontSize="42" Content="🕑" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding IsListViewVisible}"                 Background="Yellow"
+                BorderBrush="Yellow"/>
+        <ListView Grid.Row="0" Grid.Column="5" Grid.ColumnSpan="4" Grid.RowSpan="6" Name="historyListView" FontSize="20" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding HistorySave}" Visibility="{Binding IsListViewVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="History" Width="235" DisplayMemberBinding="{Binding}"/>
+                </GridView>
+            </ListView.View>
 
-        <Border Grid.Row="4" Grid.Column="5" Grid.ColumnSpan="4" BorderBrush="Black" BorderThickness="2.5" Background="LightGray">
-            <TextBox
-                x:Name="textBlock1"
-                FontSize="25"
-                 VerticalAlignment="Center" 
-                HorizontalAlignment="Center" 
-                Text="{Binding DisplayHis1, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
- 
-                ></TextBox>
-        </Border>
+        </ListView>
 
-        <Border Grid.Row="3" Grid.Column="5" Grid.ColumnSpan="4" BorderBrush="Black" BorderThickness="2.5" Background="LightGray">
-            <TextBox
-                x:Name="textBlock2"
-                FontSize="25"
-                 VerticalAlignment="Center" 
-                HorizontalAlignment="Center" 
-                Text="{Binding DisplayHis2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                ></TextBox>
-        </Border>
 
-        <Border Grid.Row="2" Grid.Column="5" Grid.ColumnSpan="4" BorderBrush="Black" BorderThickness="2.5" Background="LightGray">
-            <TextBox
-                x:Name="textBlock3"
-                FontSize="25"
-                 VerticalAlignment="Center" 
-                HorizontalAlignment="Center" 
-                Text="{Binding DisplayHis3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                ></TextBox>
-        </Border>
-
-        <Border Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="4" BorderBrush="Black" BorderThickness="2.5" Background="LightGray">
-            <TextBox
-                x:Name="textBlock4"
-                FontSize="25"
-                 VerticalAlignment="Center" 
-                HorizontalAlignment="Center" 
-                Text="{Binding DisplayHis4, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                ></TextBox>
-        </Border>
-
-        <Border Grid.Row="0" Grid.Column="5" Grid.ColumnSpan="4" BorderBrush="Black" BorderThickness="2.5" Background="LightGray">
-            <TextBox
-                x:Name="textBlock5"
-                FontSize="25"
-                 VerticalAlignment="Center" 
-                HorizontalAlignment="Center" 
-                Text="{Binding DisplayHis5, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                ></TextBox>
-        </Border>
-
-        <Button Grid.Row="0" 
-                Grid.Column="4" 
+        <Button Grid.Row="1" 
+                Grid.Column="3" 
                 FontSize="20"
                 Content="AC" 
                 x:Name="BtnClear"
@@ -113,7 +99,42 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="4" 
+        <Button Grid.Row="1" 
+                Grid.Column="4" 
+                FontSize="20"
+                Content="⌫" 
+                x:Name="BtnDelete"
+                Command="{Binding DeleteCommand}"                 
+                Background="Yellow"
+                BorderBrush="Yellow"
+                BorderThickness="2.5"
+                Style="{StaticResource GrayTextButtonStyle}"
+                />
+        <Button Grid.Row="1" 
+                Grid.Column="1" 
+                FontSize="20"
+                Content="(" 
+                x:Name="Btn1"
+                CommandParameter="("
+                Command="{Binding AddCommand}"                 
+                Background="Yellow"
+                BorderBrush="Yellow"
+                BorderThickness="2.5"
+                Style="{StaticResource GrayTextButtonStyle}"
+                />
+        <Button Grid.Row="1" 
+                Grid.Column="2" 
+                FontSize="20"
+                Content=")" 
+                x:Name="Btn2"
+                CommandParameter=")"
+                Command="{Binding AddCommand}"                 
+                Background="Yellow"
+                BorderBrush="Yellow"
+                BorderThickness="2.5"
+                Style="{StaticResource GrayTextButtonStyle}"
+                />
+        <Button Grid.Row="5" 
                 Grid.Column="1" 
                 FontSize="20"
                 Content="0" 
@@ -125,7 +146,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="3" 
+        <Button Grid.Row="4" 
                 Grid.Column="0" 
                 Content="1"
                 FontSize="20"                
@@ -137,7 +158,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="3" 
+        <Button Grid.Row="4" 
                 Grid.Column="1" 
                 Content="2"
                 FontSize="20"                
@@ -149,7 +170,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="3" 
+        <Button Grid.Row="4" 
                 Grid.Column="2" 
                 Content="3"
                 FontSize="20"                
@@ -161,7 +182,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="2" 
+        <Button Grid.Row="3" 
                 Grid.Column="0"
                 Content="4"
                 FontSize="20"                
@@ -173,7 +194,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="2" 
+        <Button Grid.Row="3" 
                 Grid.Column="1" 
                 Content="5" 
                 FontSize="20"                
@@ -185,7 +206,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="2"
+        <Button Grid.Row="3"
                 Grid.Column="2" 
                 Content="6" 
                 FontSize="20"                
@@ -197,7 +218,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="1"
+        <Button Grid.Row="2"
                 Grid.Column="0" 
                 Content="7" 
                 FontSize="20"                
@@ -209,7 +230,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="1"
+        <Button Grid.Row="2"
                 Grid.Column="1"
                 Content="8" 
                 FontSize="20"                
@@ -221,7 +242,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="1"
+        <Button Grid.Row="2"
                 Grid.Column="2" 
                 Content="9"
                 FontSize="20"                
@@ -233,7 +254,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="4"
+        <Button Grid.Row="5"
                 Grid.Column="0" 
                 Content="."
                 FontSize="20"                
@@ -245,7 +266,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="4"
+        <Button Grid.Row="5"
                 Grid.Column="2"
                 Content="=" 
                 FontSize="20"
@@ -256,7 +277,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="4"
+        <Button Grid.Row="5"
                 Grid.Column="3"
                 Content="/" 
                 FontSize="20"
@@ -268,7 +289,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="3" 
+        <Button Grid.Row="4" 
                 Grid.Column="3" 
                 Content="*"
                 FontSize="20"
@@ -280,7 +301,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="2" 
+        <Button Grid.Row="3" 
                 Grid.Column="3" 
                 Content="-"
                 FontSize="20"
@@ -292,7 +313,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="1"
+        <Button Grid.Row="2"
                 Grid.Column="3"
                 Content="+" 
                 FontSize="20"
@@ -304,7 +325,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="1"
+        <Button Grid.Row="2"
                 Grid.Column="4" 
                 Content="sin"
                 FontSize="20"
@@ -315,7 +336,7 @@
                 Style="{StaticResource GrayTextButtonStyle}"
                 Command="{Binding SinCommand}"
                 CommandParameter="sin"/>
-        <Button Grid.Row="2" 
+        <Button Grid.Row="3" 
                 Grid.Column="4"
                 Content="cos"
                 FontSize="20"
@@ -327,7 +348,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="3"
+        <Button Grid.Row="4"
                 Grid.Column="4"
                 Content="tan"
                 x:Name="BtnTan"
@@ -339,7 +360,7 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <Button Grid.Row="4"
+        <Button Grid.Row="5"
                 Grid.Column="4" 
                 Content="√ "
                 FontSize="20"
@@ -351,6 +372,5 @@
                 BorderThickness="2.5"
                 Style="{StaticResource GrayTextButtonStyle}"
                 />
-        <ListBox Grid.Column="8" HorizontalAlignment="Left" Margin="60,0,-100,0" Grid.RowSpan="5" Width="100"/>
     </Grid>
 </Window>

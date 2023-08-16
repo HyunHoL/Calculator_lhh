@@ -9,9 +9,5 @@ namespace Calc.Model
     class MainModel
     {
 
-        public void add()
-        {
-
-        }
     }
 }
