@@ -149,6 +149,11 @@ namespace Calc.ViewModel
                     int idx = 0;
                     string inputResult = "";
 
+                    if (_selectedHistoryItem == null)
+                    {
+                        return;
+                    }
+
                     for (int i = 0; i < _selectedHistoryItem.Length; i++)
                     {
                         if (_selectedHistoryItem[i] == '=')
@@ -380,7 +385,6 @@ namespace Calc.ViewModel
                 return 1;
             }
 
-
             return 0;
         }
 
@@ -523,7 +527,6 @@ namespace Calc.ViewModel
 
                 else
                 {
-
                     double number1 = double.Parse(Pop2());
                     double number2 = double.Parse(Pop2());
 

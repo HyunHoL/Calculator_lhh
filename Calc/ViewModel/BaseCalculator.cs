@@ -8,22 +8,22 @@ namespace Calc.ViewModel
 {
     class BaseCalculator
     {
-        public double Add (double number1, double number2)
+        public virtual double Add (double number1, double number2)
         {
             return (number1 + number2);
         }
 
-        public double Minus (double number1, double number2)
+        public virtual double Minus (double number1, double number2)
         {
             return (number1 - number2);
         }
 
-        public double Multiply (double number1, double number2)
+        public virtual double Multiply (double number1, double number2)
         {
             return (number1 * number2);
         }
 
-        public double Divide (double number1, double number2)
+        public virtual double Divide (double number1, double number2)
         {
             return (number1 / number2);
         }

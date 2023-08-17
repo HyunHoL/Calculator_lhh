@@ -12,9 +12,6 @@
     </Window.DataContext>
 
     <Window.Resources>
-        <Style TargetType="Button" x:Key="GrayTextButtonStyle">
-            <Setter Property="Foreground" Value="Gray"/>
-        </Style>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
 
@@ -41,12 +38,12 @@
             <ColumnDefinition Width="50"/>
         </Grid.ColumnDefinitions>
 
-        <Border  Grid.Row="0" Grid.ColumnSpan="5" Grid.RowSpan="2" BorderBrush="Black" BorderThickness="0" Background="#A6C1EE" >
+        <Border  Grid.Row="0" Grid.ColumnSpan="5" Grid.RowSpan="2" BorderBrush="Black" BorderThickness="0" Background="#FFAFC1EF" >
             <TextBox x:Name="textBox"                      
                        FontSize="35" 
                        VerticalAlignment="Center" 
                        HorizontalAlignment="Center" 
-                       Text="{Binding DisplayText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="White" Background="#A6C1EE" BorderThickness="0"
+                       Text="{Binding DisplayText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="White" Background="#FFAFC1EF" BorderThickness="0"
                        >
                 <TextBox.InputBindings>
                     <KeyBinding Command="{Binding CalcCommand}" Key="Enter"/>
@@ -81,14 +78,14 @@
             </TextBox>
         </Border>
         <ToggleButton Grid.Row="2" Grid.Column="4" BorderThickness="0" FontSize="25" Content="🕑" IsChecked="{Binding IsListViewVisible}" Foreground="White" Background="#FFBBC1ED" BorderBrush="#FFBBC1ED"/>
-        <ListView Grid.Column="5" Grid.ColumnSpan="4" Grid.RowSpan="4" Name="historyListView" FontSize="15" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White" ItemsSource="{Binding HistorySave}" SelectedItem="{Binding SelectedHistoryItem}" Visibility="{Binding IsListViewVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="🕑" Width="200" DisplayMemberBinding="{Binding}"/>
-                </GridView>
-            </ListView.View>
+        <ListView Grid.Column="5" Grid.ColumnSpan="4" Grid.RowSpan="4" BorderThickness="0" Foreground="White" Name="historyListView" FontSize="15" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding HistorySave}" SelectedItem="{Binding SelectedHistoryItem}" Visibility="{Binding IsListViewVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <ListView.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#FFAFC1EF" Offset="0"/>
+                    <GradientStop Color="#FBC2EB" Offset="1"/>
+                </LinearGradientBrush>
+            </ListView.Background>
         </ListView>
-
 
         <Button Grid.Row="2" 
                 Grid.Column="0" 
@@ -99,9 +96,8 @@
                 Foreground="White"
                 Background="#FFBBC1ED"
                 BorderBrush="#FF7DACFF"
-                BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
-                />
+                BorderThickness="0"/>
+        
         <Button Grid.Row="2" 
                 Grid.Column="3" 
                 FontSize="20"
@@ -112,7 +108,6 @@
                 Background="#FFBBC1ED"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="2" 
                 Grid.Column="1"
@@ -125,7 +120,6 @@
                 Background="#FFBBC1ED"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="2" 
                 Grid.Column="2" 
@@ -138,7 +132,6 @@
                 Background="#FFBBC1ED"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="6" 
                 Grid.Column="1" 
@@ -151,7 +144,6 @@
                 Background="#FBC2EB"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="5" 
                 Grid.Column="0" 
@@ -164,7 +156,6 @@
                 Background="#FFF0C2EB"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="5" 
                 Grid.Column="1" 
@@ -177,7 +168,6 @@
                 Background="#FFF0C2EB"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="5" 
                 Grid.Column="2" 
@@ -190,7 +180,6 @@
                 Background="#FFF0C2EB"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="4" 
                 Grid.Column="0"
@@ -203,7 +192,6 @@
                 Background="#FFE5C2EC"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="4" 
                 Grid.Column="1" 
@@ -216,7 +204,6 @@
                 Background="#FFE5C2EC"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="4"
                 Grid.Column="2" 
@@ -229,7 +216,6 @@
                 Background="#FFE5C2EC"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="3"
                 Grid.Column="0" 
@@ -242,7 +228,6 @@
                 Background="#FFD0C1EC"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="3"
                 Grid.Column="1"
@@ -255,7 +240,6 @@
                 Background="#FFD0C1EC"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="3"
                 Grid.Column="2" 
@@ -268,7 +252,6 @@
                 Foreground="White"
                 Background="#FFD0C1EC"
                 BorderBrush="#FF7DACFF"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="6"
                 Grid.Column="0" 
@@ -281,7 +264,6 @@
                 Background="#FBC2EB"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="6"
                 Grid.Column="2"
@@ -293,7 +275,6 @@
                 Background="#FBC2EB"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="6"
                 Grid.Column="3"
@@ -306,7 +287,6 @@
                 Background="#FBC2EB"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="5" 
                 Grid.Column="3" 
@@ -319,7 +299,6 @@
                 Background="#FFF0C2EB"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="4" 
                 Grid.Column="3" 
@@ -332,7 +311,6 @@
                 Background="#FFE5C2EC"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="3"
                 Grid.Column="3"
@@ -345,7 +323,6 @@
                 Background="#FFD0C1EC"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="3"
                 Grid.Column="4" 
@@ -356,7 +333,6 @@
                 BorderBrush="#FF7DACFF"
                 Foreground="White"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 Command="{Binding SinCommand}"
                 CommandParameter="sin"/>
         <Button Grid.Row="4" 
@@ -370,7 +346,6 @@
                 Background="#FFE5C2EC"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="5"
                 Grid.Column="4"
@@ -383,7 +358,6 @@
                 Background="#FFF0C2EB"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
         <Button Grid.Row="6"
                 Grid.Column="4" 
@@ -396,7 +370,6 @@
                 Background="#FBC2EB"
                 BorderBrush="#FF7DACFF"
                 BorderThickness="0"
-                Style="{StaticResource GrayTextButtonStyle}"
                 />
     </Grid>
 </Window>

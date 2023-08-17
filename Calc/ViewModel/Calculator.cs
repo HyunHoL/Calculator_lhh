@@ -8,39 +8,65 @@ namespace Calc.ViewModel
 {
     class Calculator : BaseCalculator
     {
-        public static Calculator operator + (Calculator calc, double value)
+        public double Value { get; private set; }
+
+        public Calculator(double numValue)
         {
-            Calculator result = new Calculator();
-            result.Add(value, 0);
-            return result;
+            Value = numValue;
         }
 
-        public static Calculator operator - (Calculator calc, double value)
+        public override double Add(double number1, double number2)
         {
-            Calculator result = new Calculator();
-            result.Minus(value, 0);
-            return result;
+            return number1 + number2;
         }
 
-        /**
-        * @brief 연산 기호 별로 연산을 진행해주는 함수
-        * @return (double) 연산 결과 값을 반환해줌
-        * @note Patch-notes
-        * 2023-08-09|이현호
-        */
+        public override double Minus(double number1, double number2)
+        {
+            return number1 - number2;
+        }
+
+        public override double Multiply(double number1, double number2)
+        {
+            return number1 * number2;
+        }
+
+        public override double Divide(double number1, double number2)
+        {
+            return number1 / number2;
+        }
+
+        public static Calculator operator + (Calculator num1, Calculator num2)
+        {
+            return new Calculator(num1.Value + num2.Value);
+        }
+
+        public static Calculator operator -(Calculator num1, Calculator num2)
+        {
+            double newText = num1.Value - num2.Value;
+            return new Calculator(newText);
+        }
+
 
         public static double Calculate(string inputOperator, double inputNumber1, double inputNumber2)
         {
 
+            Calculator number1 = new Calculator(inputNumber1);
+            Calculator number2 = new Calculator(inputNumber2);
+            double result = 0;
+
             switch (inputOperator)
             {
-                case "+": return inputNumber1 + inputNumber2;
-                case "-": return inputNumber2 - inputNumber1;
-                case "*": return inputNumber1 * inputNumber2;
-                case "/": return inputNumber2 / inputNumber1;
+                case "+": 
+                    result = (number1 + number2).Value;
+                    break;
+                case "-":
+                    result = (number1 - number2).Value;
+                    break;
+                case "*": return number1.Value * number2.Value;
+                case "/": return number2.Value / number1.Value;
             }
 
-            return 0;
+            return result;
         }
     }
 }
