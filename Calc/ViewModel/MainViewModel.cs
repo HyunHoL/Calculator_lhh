@@ -21,7 +21,7 @@ namespace Calc.ViewModel
 
         #region [상수]
 
-        public string inputString;
+        public string inputString, inputBracket;
 
         public string mathematicalExpression;
 
@@ -49,6 +49,7 @@ namespace Calc.ViewModel
 
         #region [속성]
         public ICommand AddCommand { get; }
+        public ICommand AddBracket { get; }
         public ICommand OperationCommand { get; }
         public ICommand CalcCommand { get; }
         public ICommand ClearCommand { get; }
@@ -59,7 +60,10 @@ namespace Calc.ViewModel
         public ICommand RootCommand { get; }
         public ObservableCollection<String> HistorySave { get; } = new ObservableCollection<string>();
         public ICommand ToggleListViewCommand { get; }
+
         private bool _isListViewVisible = false;
+        private string _selectedHistoryItem;
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
@@ -68,7 +72,7 @@ namespace Calc.ViewModel
         public CalcVM()
         {
 
-            inputNum = inputString = string.Empty;
+            inputBracket = inputNum = inputString = string.Empty;
             history2 = history3 = history4 = history5 = history = mathematicalExpression = "";
             result = result2 = result3 = result4 = result5 = "";
             inputValue = new string[100];
@@ -78,6 +82,7 @@ namespace Calc.ViewModel
             front = rear = 0;
 
             AddCommand = new RelayCommand(UpdateDisplayText);
+            AddBracket = new RelayCommand(GetBracket);
             OperationCommand = new RelayCommand(GetOperator);
             CalcCommand = new RelayCommand(CalcPostfix);
             ClearCommand = new RelayCommand(StartClear);
@@ -93,6 +98,13 @@ namespace Calc.ViewModel
 
         #region [public Method]
 
+        /**
+        * @brief 버튼을 클릭했을 때만 ListView가 보이게 해주는 함수
+        * @return (bool) false일 때, ListView 보이지 않음 , true일 때, ListView 보임
+        * @note Patch-notes
+        * 2023-08-17|이현호
+        */
+
         public bool IsListViewVisible
         {
             get => _isListViewVisible;
@@ -107,9 +119,58 @@ namespace Calc.ViewModel
             }
         }
 
+        /**
+        * @brief 버튼을 눌렀을 때, bool 값을 바꿔주는 함수
+        * @note Patch-notes
+        * 2023-08-17|이현호
+        */
+
         public void ToggleListViewVisibility()
         {
             IsListViewVisible = !IsListViewVisible;
+        }
+
+        /**
+        * @brief 연산 history를 클릭했을 때, 연산 결과 값을 TextBox에 출력해주는 함수
+        * @return (string) 연산 결과
+        * @note Patch-notes
+        * 2023-08-17|이현호
+        */
+
+        public string SelectedHistoryItem
+        {
+            get { return _selectedHistoryItem; }
+            set
+            {
+                if (_selectedHistoryItem != value)
+                {
+                    _selectedHistoryItem = value;
+
+                    int idx = 0;
+                    string inputResult = "";
+
+                    for (int i = 0; i < _selectedHistoryItem.Length; i++)
+                    {
+                        if (_selectedHistoryItem[i] == '=')
+                        {
+                            idx = i;
+                        }
+                    }
+
+                    for (int i = 0; i < _selectedHistoryItem.Length; i++)
+                    {
+                        if (i > idx)
+                        {
+                            inputResult += _selectedHistoryItem[i];
+                        }
+                    }
+
+                    DisplayText = inputResult;
+                    AllClear();
+                    inputString = DisplayText;
+                    OnPropertyChanged(nameof(SelectedHistoryItem));
+                }
+            }
         }
 
         /**
@@ -161,16 +222,30 @@ namespace Calc.ViewModel
 
         private void UpdateDisplayText(object parameter)
         {
-            if ((string)parameter == "(" || (string)parameter == ")")
+            DisplayText += parameter;
+            inputString += parameter;
+        }
+
+        /**
+        * @brief 괄호 버튼을 클릭했을 때 괄호를 DisplayText에 저장하고 푸쉬해주는 함수
+        * @param 괄호를 받아옴
+        * @note Patch-notes
+        * 2023-08-17|이현호
+        */
+
+        private void GetBracket(object parameter)
+        {
+            if ((string)parameter == "(")
             {
                 DisplayText += parameter;
-                inputString = (string)parameter;
+                inputBracket = (string)parameter;
+                Push(inputBracket);
             }
 
             else
             {
                 DisplayText += parameter;
-                inputString += parameter;
+                inputBracket = (string)parameter;
             }
         }
 
@@ -249,26 +324,6 @@ namespace Calc.ViewModel
             return result;
         }
 
-        private void Enqueue (string inputNum)
-        {
-            historySave[front] = inputNum;
-            front = (front + 1) % historySave.Length;
-            return;
-        }
-
-        private string Dequeue ()
-        {
-            if (front == rear)
-            {
-                return "ERROR";
-            }
-
-            string result = historySave[rear];
-            rear = (rear + 1) % historySave.Length;
-
-            return result;
-        }
-
         /**
         * @brief 연산자 버튼이 클릭 되었을 때, 이전에 입력한 숫자와 연산자를 inputValue 배열에 추가해주는 함수
         * @param 연산자 (+, -, *, /)
@@ -288,10 +343,21 @@ namespace Calc.ViewModel
                 return;
             }
 
-            Push(inputString);
-            DisplayText += parameter;
-            inputString = "";
-            Push((string)parameter);
+            else if (inputString == "")
+            {
+                DisplayText += parameter;
+                inputString = "";
+                Push((string)parameter);
+                return;
+            }
+
+            else
+            {
+                Push(inputString);
+                DisplayText += parameter;
+                inputString = "";
+                Push((string)parameter);
+            }
         }
 
         /**
@@ -323,11 +389,18 @@ namespace Calc.ViewModel
         * @param infix 식을 postfix로 바꿀 배열
         * @note Patch-notes
         * 2023-08-14|이현호
+        * 2023-08-17|이현호|괄호 우선 순위 추가
         */
 
         private void Postfix(string[] postfix)
         {
+
             Push(inputString);
+
+            if (inputBracket == ")")
+            {
+                Push(inputBracket);
+            }
 
             int topPostfix = -1;
             int idx = 0;
@@ -353,20 +426,25 @@ namespace Calc.ViewModel
                     {
                         while (true)
                         {
-                            string postfixOperator = Pop();
+                            string postfixOperator = Pop2();
 
                             if (postfixOperator == "(")
                             {
                                 break;
                             }
-                            postfix[topPostfix] = postfixOperator;
                             topPostfix++;
+                            postfix[topPostfix] = postfixOperator;
                         }
                     }
 
                     else
                     {
                         if (top2 == -1)
+                        {
+                            Push2(infixOperator);
+                        }
+
+                        else if (stack[top2] == "(")
                         {
                             Push2(infixOperator);
                         }
@@ -467,6 +545,7 @@ namespace Calc.ViewModel
             HistorySave.Add(displayed + "=" + DisplayText);
 
             AllClear();
+            inputBracket = string.Empty;
             inputString = DisplayText;
         }
 
@@ -484,9 +563,64 @@ namespace Calc.ViewModel
             HistorySave.Clear();
         }
 
+        /**
+        * @brief 바로 직전 연산 기록을 지우는 함수
+        * @param ⌫ 기호가 클릭 되었을 때만 실행
+        * @note Patch-notes
+        * 2023-08-17|이현호
+        */
+
         private void StartDelete (object parameter)
         {
-            Pop();
+            int idx = 0;
+            int idxNum = 0;
+            string saveText = string.Empty;
+            string saveNum = string.Empty;
+
+            for (int i = 0; i < DisplayText.Length; i++)
+            {
+                if (i == DisplayText.Length - 1)
+                {
+                    idx = i;
+                    break;
+                }
+
+                saveText += DisplayText[i];
+            }
+
+            if (DisplayText[idx] == '(')
+            {
+                Pop();
+                DisplayText = saveText;
+            }
+
+            else if (DisplayText[idx] == ')')
+            {
+                DisplayText = saveText;
+                inputBracket = string.Empty;
+            }
+
+            else if (double.TryParse(DisplayText[idx].ToString(), out double outValue))
+            {
+                for (int i = 0; i < inputString.Length; i++)
+                {
+                    if (i == inputString.Length - 1)
+                    {
+                        idxNum = i;
+                        break;
+                    }
+                    saveNum += inputString[i];
+                }
+                inputString = saveNum;
+                DisplayText = saveText;
+            }
+
+            else
+            {
+                Pop();
+                DisplayText = saveText;
+                inputString = string.Empty;
+            }
         }
 
         /**
