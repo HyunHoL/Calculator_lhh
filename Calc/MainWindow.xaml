@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Calc.ViewModel"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" >
+        Title="MainWindow" Height="1000" Width="1100" >
 
     <Window.DataContext>
         <local:CalcVM />
@@ -17,25 +17,25 @@
 
     <Grid Margin="10" HorizontalAlignment="Center" VerticalAlignment="Center">
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50"/>
-            <ColumnDefinition Width="50"/>
-            <ColumnDefinition Width="50"/>
-            <ColumnDefinition Width="50"/>
-            <ColumnDefinition Width="50"/>
-            <ColumnDefinition Width="50"/>
-            <ColumnDefinition Width="50"/>
-            <ColumnDefinition Width="50"/>
-            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
         </Grid.ColumnDefinitions>
 
         <Border  Grid.Row="0" Grid.ColumnSpan="5" Grid.RowSpan="2" BorderBrush="Black" BorderThickness="0" Background="#FFAFC1EF" >
@@ -78,7 +78,7 @@
             </TextBox>
         </Border>
         <ToggleButton Grid.Row="2" Grid.Column="4" BorderThickness="0" FontSize="25" Content="🕑" IsChecked="{Binding IsListViewVisible}" Foreground="White" Background="#FFBBC1ED" BorderBrush="#FFBBC1ED"/>
-        <ListView Grid.Column="5" Grid.ColumnSpan="4" Grid.RowSpan="4" BorderThickness="0" Foreground="White" Name="historyListView" FontSize="15" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding HistorySave}" SelectedItem="{Binding SelectedHistoryItem}" Visibility="{Binding IsListViewVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <ListView Grid.Column="5" Grid.ColumnSpan="4" Grid.RowSpan="4" BorderThickness="0" Foreground="White" Name="historyListView" FontSize="25" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding HistorySave}" SelectedItem="{Binding SelectedHistoryItem}" Visibility="{Binding IsListViewVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
             <ListView.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                     <GradientStop Color="#FFAFC1EF" Offset="0"/>

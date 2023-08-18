@@ -21,33 +21,16 @@ namespace Calc.ViewModel
 
         #region [상수]
 
-        public string inputString, inputBracket;
+        public string inputString, inputBracket, mathematicalExpression, inputNum;
 
-        public string mathematicalExpression;
+        public string[] inputValue, stack, historySave;
 
-        public string history, history2, history3, history4, history5;
-
-        public string result, result2, result3, result4, result5;
-
-        public string[] inputValue;
-
-        public string[] stack;
-
-        public int top2;
-
-        public int top;
-
-        public int front;
-
-        public int rear;
-
-        public string[] historySave;
-
-        public string inputNum;
+        public int top, top2, front, rear;
 
         #endregion
 
         #region [속성]
+        
         public ICommand AddCommand { get; }
         public ICommand AddBracket { get; }
         public ICommand OperationCommand { get; }
@@ -61,11 +44,11 @@ namespace Calc.ViewModel
         public ObservableCollection<String> HistorySave { get; } = new ObservableCollection<string>();
         public ICommand ToggleListViewCommand { get; }
 
-        private bool _isListViewVisible = false;
-        private string _selectedHistoryItem;
-
+        private bool isListViewVisible = false;
+        private string selectedHistoryItem;
 
         public event PropertyChangedEventHandler PropertyChanged;
+
         #endregion
 
         #region [생성자]
@@ -73,12 +56,8 @@ namespace Calc.ViewModel
         {
 
             inputBracket = inputNum = inputString = string.Empty;
-            history2 = history3 = history4 = history5 = history = mathematicalExpression = "";
-            result = result2 = result3 = result4 = result5 = "";
-            inputValue = new string[100];
-            stack = new string[100];
+            stack = inputValue = new string[100];
             top = top2 = -1;
-            historySave = new string[10];
             front = rear = 0;
 
             AddCommand = new RelayCommand(UpdateDisplayText);
@@ -107,13 +86,13 @@ namespace Calc.ViewModel
 
         public bool IsListViewVisible
         {
-            get => _isListViewVisible;
+            get => isListViewVisible;
 
             set
             {
-                if (_isListViewVisible != value)
+                if (isListViewVisible != value)
                 {
-                    _isListViewVisible = value;
+                    isListViewVisible = value;
                     OnPropertyChanged("IsListViewVisible");
                 }
             }
@@ -139,34 +118,34 @@ namespace Calc.ViewModel
 
         public string SelectedHistoryItem
         {
-            get { return _selectedHistoryItem; }
+            get { return selectedHistoryItem; }
             set
             {
-                if (_selectedHistoryItem != value)
+                if (selectedHistoryItem != value)
                 {
-                    _selectedHistoryItem = value;
+                    selectedHistoryItem = value;
 
                     int idx = 0;
-                    string inputResult = "";
+                    string inputResult = string.Empty;
 
-                    if (_selectedHistoryItem == null)
+                    if (selectedHistoryItem == null)
                     {
                         return;
                     }
 
-                    for (int i = 0; i < _selectedHistoryItem.Length; i++)
+                    for (int i = 0; i < selectedHistoryItem.Length; i++)
                     {
-                        if (_selectedHistoryItem[i] == '=')
+                        if (selectedHistoryItem[i] == '=')
                         {
                             idx = i;
                         }
                     }
 
-                    for (int i = 0; i < _selectedHistoryItem.Length; i++)
+                    for (int i = 0; i < selectedHistoryItem.Length; i++)
                     {
                         if (i > idx)
                         {
-                            inputResult += _selectedHistoryItem[i];
+                            inputResult += selectedHistoryItem[i];
                         }
                     }
 
@@ -204,21 +183,6 @@ namespace Calc.ViewModel
         #region [private Method] 
 
         /**
-        * @brief 입력 받은 모든 값을 초기화 해주는 함수
-        * @note Patch-notes
-        * 2023-08-14|이현호
-        */
-
-        private void AllClear ()
-        {
-            inputString = "";
-            Array.Clear(inputValue, 0, inputValue.Length);
-            Array.Clear(stack, 0, stack.Length);
-            top = -1;
-            top2 = -1;
-        }
-
-        /**
         * @brief 숫자 버튼을 클릭했을 때 숫자를 DisplayText와 InputString에 저장해주는 함수
         * @param 0부터 9까지의 숫자를 받아옴
         * @note Patch-notes
@@ -227,6 +191,11 @@ namespace Calc.ViewModel
 
         private void UpdateDisplayText(object parameter)
         {
+            if (DisplayText == "ERROR")
+            {
+                DisplayText = "";
+            }
+
             DisplayText += parameter;
             inputString += parameter;
         }
@@ -240,6 +209,11 @@ namespace Calc.ViewModel
 
         private void GetBracket(object parameter)
         {
+            if (DisplayText == "ERROR")
+            {
+                DisplayText = "";
+            }
+
             if ((string)parameter == "(")
             {
                 DisplayText += parameter;
@@ -255,81 +229,6 @@ namespace Calc.ViewModel
         }
 
         /**
-        * @brief 숫자와 연산자가 들어왔을 때 inputValue 배열에 푸쉬해주는 함수
-        * @param 버튼을 눌렀을 때, parameter를 string으로 받아 온다.
-        * @note Patch-notes
-        * 2023-08-14|이현호
-        */
-
-        private void Push (string infixOperator)
-        {
-            if (top == inputValue.Length - 1)
-            {
-                return;
-            }
-
-            top++;
-            inputValue[top] = infixOperator;
-        }
-
-        /**
-        * @brief 숫자와 연산자가 들어왔을 때 stack 배열에 푸쉬해주는 함수
-        * @param 버튼을 눌렀을 때, parameter를 string으로 받아 온다.
-        * @note Patch-notes
-        * 2023-08-14|이현호
-        */
-
-        private void Push2 (string infixOperator)
-        {
-            if (top2 == stack.Length - 1)
-            {
-                return;
-            }
-
-            top2++;
-            stack[top2] = infixOperator;
-        }
-
-        /**
-        * @brief inputValue 배열의 마지막에 들어온 값을 빼주는 함수
-        * @return (string) 배열의 제일 마지막에 들어온 값을 반환
-        * @note Patch-notes
-        * 2023-08-14|이현호
-        */
-
-        private string Pop ()
-        {
-            if (top == -1)
-            {
-                return "ERROR";
-            }
-
-            string result = inputValue[top];
-            top--;
-            return result;
-        }
-
-        /**
-        * @brief stack 배열의 마지막에 들어온 값을 빼주는 함수
-        * @return (string) 배열의 제일 마지막에 들어온 값을 반환
-        * @note Patch-notes
-        * 2023-08-14|이현호
-        */
-
-        private string Pop2()
-        {
-            if (top2 == -1)
-            {
-                return "ERROR";
-            }
-
-            string result = stack[top2];
-            top2--;
-
-            return result;
-        }
-
-        /**
         * @brief 연산자 버튼이 클릭 되었을 때, 이전에 입력한 숫자와 연산자를 inputValue 배열에 추가해주는 함수
         * @param 연산자 (+, -, *, /)
         * @note Patch-notes
@@ -338,14 +237,29 @@ namespace Calc.ViewModel
 
         private void GetOperator (object parameter)
         {
+            if (DisplayText == "ERROR")
+            {
+                DisplayText = "";
+            }
+
             if ((string)parameter == "-")
             {
-                Push((string)inputString);
-                DisplayText += parameter;
-                inputString = "";
-                Push("+");
-                inputString += "-";
-                return;
+                if (inputString == string.Empty)
+                {
+                    inputString += "-";
+                    DisplayText += "-";
+                    return;
+                }
+
+                else
+                {
+                    Push((string)inputString);
+                    DisplayText += parameter;
+                    inputString = "";
+                    Push("+");
+                    inputString += "-";
+                    return;
+                }
             }
 
             else if (inputString == "")
@@ -430,6 +344,11 @@ namespace Calc.ViewModel
                     {
                         while (true)
                         {
+                            if (top2 == -1)
+                            {
+                                return;
+                            }
+
                             string postfixOperator = Pop2();
 
                             if (postfixOperator == "(")
@@ -527,8 +446,32 @@ namespace Calc.ViewModel
 
                 else
                 {
-                    double number1 = double.Parse(Pop2());
-                    double number2 = double.Parse(Pop2());
+                    double number1 = 0;
+                    double number2 = 0;
+
+                    if (double.TryParse(Pop2(), out double number))
+                    {
+                        number1 = number;
+                    }
+
+                    else
+                    {
+                        DisplayText = "ERROR";
+                        AllClear();
+                        return;
+                    }
+
+                    if (double.TryParse(Pop2(), out double num))
+                    {
+                        number2 = num;
+                    }
+
+                    else
+                    {
+                        DisplayText = "ERROR";
+                        AllClear();
+                        return;
+                    }
 
                     if (postfixOperator == "/" && number1 == 0)
                     {
@@ -635,6 +578,7 @@ namespace Calc.ViewModel
 
         private void CalcSin(object parameter)
         {
+
             if (!double.TryParse(inputString, out double letter))
             {
                 DisplayText = "ERROR";
@@ -685,7 +629,7 @@ namespace Calc.ViewModel
 
             double tanValue = Math.Tan(double.Parse(inputString) * Math.PI / 180);
             
-            if (double.Parse(inputString) % 90 == 0)
+            if (double.Parse(inputString) % 90 == 0 && (double.Parse(inputString) / 90) % 2 != 0)
             {
                 DisplayText = "ERROR";
                 AllClear();
@@ -717,11 +661,103 @@ namespace Calc.ViewModel
                 AllClear();
                 return;
             }
+
             double rootValue = Math.Sqrt(double.Parse(inputString));
             inputString = rootValue.ToString();
             DisplayText = rootValue.ToString();
         }
 
+
+        /**
+        * @brief 숫자와 연산자가 들어왔을 때 inputValue 배열에 푸쉬해주는 함수
+        * @param 버튼을 눌렀을 때, parameter를 string으로 받아 온다.
+        * @note Patch-notes
+        * 2023-08-14|이현호
+        */
+
+        private void Push(string infixOperator)
+        {
+            if (top == inputValue.Length - 1)
+            {
+                return;
+            }
+
+            top++;
+            inputValue[top] = infixOperator;
+        }
+
+        /**
+        * @brief 숫자와 연산자가 들어왔을 때 stack 배열에 푸쉬해주는 함수
+        * @param 버튼을 눌렀을 때, parameter를 string으로 받아 온다.
+        * @note Patch-notes
+        * 2023-08-14|이현호
+        */
+
+        private void Push2(string infixOperator)
+        {
+            if (top2 == stack.Length - 1)
+            {
+                return;
+            }
+
+            top2++;
+            stack[top2] = infixOperator;
+        }
+
+        /**
+        * @brief inputValue 배열의 마지막에 들어온 값을 빼주는 함수
+        * @return (string) 배열의 제일 마지막에 들어온 값을 반환
+        * @note Patch-notes
+        * 2023-08-14|이현호
+        */
+
+        private string Pop()
+        {
+            if (top == -1)
+            {
+                return "ERROR";
+            }
+
+            string result = inputValue[top];
+            top--;
+            return result;
+        }
+
+        /**
+        * @brief stack 배열의 마지막에 들어온 값을 빼주는 함수
+        * @return (string) 배열의 제일 마지막에 들어온 값을 반환
+        * @note Patch-notes
+        * 2023-08-14|이현호
+        */
+
+        private string Pop2()
+        {
+            if (top2 == -1)
+            {
+                return "ERROR";
+            }
+
+            string result = stack[top2];
+            top2--;
+
+            return result;
+        }
+
+
+        /**
+        * @brief 입력 받은 모든 값을 초기화 해주는 함수
+        * @note Patch-notes
+        * 2023-08-14|이현호
+        */
+
+        private void AllClear()
+        {
+            inputString = "";
+            Array.Clear(inputValue, 0, inputValue.Length);
+            Array.Clear(stack, 0, stack.Length);
+            top = -1;
+            top2 = -1;
+        }
 
         protected void OnPropertyChanged(string propertyName)
         {
